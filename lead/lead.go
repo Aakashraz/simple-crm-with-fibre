@@ -4,15 +4,16 @@ import (
 	"github.com/Aakashraz/crm-with-golang-fiber/database"
 	"github.com/gofiber/fiber"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
 )
 
 type Lead struct {
 	gorm.Model
-	Name    string
-	Company string
-	Email   string
-	Phone   int
+	Name    string `json:"name"`
+	Company string `json:"company"`
+	Email   string `json:"email"`
+	Phone   int    `json:"phone"`
 }
 
 func GetLeads(c *fiber.Ctx) {
@@ -56,5 +57,15 @@ func NewLead(c *fiber.Ctx) {
 }
 
 func DeleteLead(c *fiber.Ctx) {
-	//
+	id := c.Params("id")
+	db := database.Db
+
+	var ld Lead
+	db.First(&ld, id)
+	if ld.Name == "" {
+		c.Status(500).Send("No lead found with the ID.")
+		return
+	}
+	db.Delete(&ld)
+	c.Send("lead successfully Deleted!!!")
 }
