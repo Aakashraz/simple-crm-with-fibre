@@ -41,6 +41,7 @@ func GetLead(c *fiber.Ctx) {
 	}
 }
 
+// NewLead - Does not create new data reusing the deleted id
 func NewLead(c *fiber.Ctx) {
 	db := database.Db
 	//The new function is used to allocate memory for a new	  zero-initialized value of the specified type.
@@ -49,7 +50,7 @@ func NewLead(c *fiber.Ctx) {
 		c.Status(503).Send(err)
 		return
 	}
-	db.CreateTable(&lead)
+	db.Create(&lead)
 	err := c.JSON(lead)
 	if err != nil {
 		log.Printf("error while serializing and sending JSON response: %v", err)
@@ -62,10 +63,10 @@ func DeleteLead(c *fiber.Ctx) {
 
 	var ld Lead
 	db.First(&ld, id)
-	if ld.Name == "" {
+	if ld.ID == 0 {
 		c.Status(500).Send("No lead found with the ID.")
 		return
 	}
 	db.Delete(&ld)
-	c.Send("lead successfully Deleted!!!")
+	c.Send("preferred Data successfully Deleted!!!")
 }
